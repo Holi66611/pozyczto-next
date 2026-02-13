@@ -1,7 +1,8 @@
 {
   "name": "pozyczto-next-vercel",
   "version": "0.4.0",
-  "private": true,
+  "private": true,"next": "14.2.18"
+
   "scripts": {
     "dev": "next dev",
     "build": "next build",
