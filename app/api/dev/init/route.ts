@@ -1,10 +1,23 @@
+import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
-export async function GET(){
-  await sql`CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, name TEXT NOT NULL, passhash TEXT NOT NULL, createdAt BIGINT NOT NULL);`;
-  await sql`CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY, ownerId TEXT, title TEXT NOT NULL, cat TEXT NOT NULL, price REAL NOT NULL, deposit REAL DEFAULT 0, city TEXT NOT NULL, desc TEXT, image TEXT, imageUrl TEXT, rating REAL DEFAULT 4.5, createdAt BIGINT NOT NULL);`;
-  await sql`CREATE TABLE IF NOT EXISTS bookings (id TEXT PRIMARY KEY, itemId TEXT NOT NULL, renterId TEXT NOT NULL, dateFrom BIGINT NOT NULL, dateTo BIGINT NOT NULL, status TEXT NOT NULL, createdAt BIGINT NOT NULL);`;
-  await sql`CREATE TABLE IF NOT EXISTS threads (id TEXT PRIMARY KEY, userA TEXT NOT NULL, userB TEXT NOT NULL, createdAt BIGINT NOT NULL);`;
-  await sql`CREATE TABLE IF NOT EXISTS messages (id TEXT PRIMARY KEY, threadId TEXT NOT NULL, senderId TEXT NOT NULL, body TEXT NOT NULL, createdAt BIGINT NOT NULL);`;
-  return NextResponse.json({ ok:true });
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
+export async function GET() {
+  if (!process.env.POSTGRES_URL) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "POSTGRES_URL is missing. Set the database environment variable before running /api/dev/init.",
+      },
+      { status: 503 },
+    );
+  }
+
+  await sql`select 1`;
+
+  return NextResponse.json({ ok: true });
 }
