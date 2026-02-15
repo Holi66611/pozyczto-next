@@ -1,23 +1,30 @@
-import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
+import { sql } from '@/lib/db';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const runtime = 'nodejs';
+export async function GET(){
+  await sql`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      passhash TEXT NOT NULL,
+      createdAt BIGINT NOT NULL
+    );`;
 
-export async function GET() {
-  if (!process.env.POSTGRES_URL) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "POSTGRES_URL is missing. Set the database environment variable before running /api/dev/init.",
-      },
-      { status: 503 },
-    );
-  }
-
-  await sql`select 1`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS items (
+      id TEXT PRIMARY KEY,
+      ownerId TEXT,
+      title TEXT NOT NULL,
+      cat TEXT NOT NULL,
+      price REAL NOT NULL,
+      deposit REAL DEFAULT 0,
+      city TEXT NOT NULL,
+      desc TEXT,
+      imageUrl TEXT,
+      rating REAL DEFAULT 4.7,
+      createdAt BIGINT NOT NULL
+    );`;
 
   return NextResponse.json({ ok: true });
 }
